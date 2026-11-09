@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
+<meta http-equiv="Cache-Control" content="no-store">
 <meta name="color-scheme" content="light dark">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src https://teamjas.in https://localhost:44392; base-uri 'none'; form-action 'none'">
 <title>MyHealth card</title>
@@ -456,7 +457,7 @@ td.r{text-align:right;white-space:nowrap}
   function add(parent, node) { if (node) parent.appendChild(node); }
 
   /* ---------- the two designs ---------- */
-  function renderEmergency(m) {
+  function renderEmergency(m, opened) {
     app.textContent = '';
     app.appendChild(hero(m));
     app.appendChild(callBlock(m));
@@ -468,7 +469,9 @@ td.r{text-align:right;white-space:nowrap}
     add(app, vitalsCard(m));
     add(app, deviceCard(m));
     add(app, stayCard(m, true));
-    foot(app, 'Shown from the QR code itself. Nothing is stored on this website. General information, not a diagnosis.');
+    foot(app, opened
+      ? 'Shown from a QR that works for 3 minutes. When the time is up this card closes by itself and the QR stops working. Nothing is stored on this website. General information, not a diagnosis.'
+      : 'Sample data. General information, not a diagnosis.');
   }
 
   function renderDoctor(m, opened) {
@@ -563,6 +566,86 @@ td.r{text-align:right;white-space:nowrap}
     input.focus();
   }
 
+  /* ---------- emergency: the QR opens the card by itself, once, within 3 minutes ---------- */
+  var CLOSE_AFTER_MS = 10 * 60 * 1000;   // a doctor's one-time summary wipes itself from this phone after this
+  var closeTimer = 0;
+  var tickTimer = 0;
+
+  function clock(ms) {
+    var t = Math.max(0, Math.ceil(ms / 1000));
+    return Math.floor(t / 60) + ':' + (t % 60 < 10 ? '0' : '') + (t % 60);
+  }
+
+  /* an emergency card is shown only until the QR's 3 minutes are over, by the server's clock (not this phone's) */
+  function closeAt(ms) {
+    clearTimeout(closeTimer);
+    clearInterval(tickTimer);
+    if (ms <= 0) { closeForPrivacy(); return; }
+    var end = Date.now() + ms;
+    var note = el('div', 'foot');
+    note.appendChild(icon('shield'));
+    var label = document.createTextNode('');
+    note.appendChild(label);
+    app.insertBefore(note, app.firstChild.nextSibling);
+    function tick() { label.textContent = ' This card closes in ' + clock(end - Date.now()) + ' and cannot be opened again after that.'; }
+    tick();
+    tickTimer = setInterval(tick, 1000);
+    closeTimer = setTimeout(closeForPrivacy, ms);
+  }
+
+  function closeForPrivacy() {
+    clearInterval(tickTimer);
+    app.textContent = '';
+    document.title = 'Card closed';
+    fail('This card was closed for privacy. Ask for a new QR from the MyHealth app to see it again.');
+  }
+
+  function autoOpen(token, apiRoot, code) {
+    app.textContent = '';
+    var wait = el('div', 'foot'); wait.appendChild(icon('shield')); wait.appendChild(document.createTextNode(' Opening the card...'));
+    app.appendChild(wait);
+    fetch(apiRoot + '/shares/' + encodeURIComponent(token) + '/open', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ code: code }), referrerPolicy: 'no-referrer', cache: 'no-store'
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) { return { res: res, data: data }; });
+    }).then(function (r) {
+      if (r.res.ok && r.data && r.data.summary) {
+        var sum = r.data.summary;
+        var left = CLOSE_AFTER_MS;
+        if (sum && sum.k === 'e') {
+          renderEmergency(model(sum, 'e'), true);
+          document.title = (sum.n ? sum.n + ' \u00b7 ' : '') + 'Emergency card';
+          var until = Date.parse(r.data.expiresUtc), at = Date.parse(r.data.nowUtc);
+          left = isFinite(until) && isFinite(at) ? until - at : 3 * 60 * 1000;
+          window.scrollTo(0, 0);
+          closeAt(left);
+          return;
+        }
+        renderDoctor(model(sum, 'd'), true);
+        window.scrollTo(0, 0);
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(closeForPrivacy, left);
+        return;
+      }
+      if (r.res.status === 410 || r.res.status === 403) {
+        fail('This QR has expired or was already used. A QR works once, for 3 minutes. Ask for a new one.');
+        return;
+      }
+      retry('This card could not be opened right now.', token, apiRoot, code);
+    }).catch(function () {
+      retry('No connection. Check the internet and try again.', token, apiRoot, code);
+    });
+  }
+
+  function retry(text, token, apiRoot, code) {
+    fail(text);
+    var b = el('button', 'btn'); b.type = 'button';
+    b.appendChild(document.createTextNode('Try again'));
+    b.addEventListener('click', function () { autoOpen(token, apiRoot, code); });
+    app.appendChild(b);
+  }
+
   /* ---------- sample data, so the design can be seen without a QR: #demo and #demo-doctor ---------- */
   var DEMO_E = { v: 2, k: 'e', n: 'Shiva Kumar Dagan', a: 42, s: 'Male', b: 'B+', i: 'MH-2026-7X3Y', u: '2026-11-09',
     al: ['Penicillin (rash)', 'Sulfa drugs'], co: ['Type 2 diabetes', 'High blood pressure', 'Fatty liver'],
@@ -591,16 +674,18 @@ td.r{text-align:right;white-space:nowrap}
       var api = (parts.a || ALLOWED_API[0]).replace(/\/+$/, '');
       if (!parts.t || !/^[A-Za-z0-9_-]{8,100}$/.test(parts.t)) throw new Error('token');
       if (ALLOWED_API.indexOf(api) < 0) throw new Error('api');
+      if (parts.c && /^[A-Za-z0-9-]{8,9}$/.test(parts.c)) {
+        var code = parts.c.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        history.replaceState(null, '', location.pathname);   // the code never stays in the address bar or history
+        autoOpen(parts.t, api, code);
+        return;
+      }
       renderGate(parts.t, api);
       return;
     }
-    if (hash.length < 3) throw new Error('empty');
-    var data = JSON.parse(b64urlToText(hash));
-    if (!data || data.v !== 2 || data.k !== 'e') throw new Error('version');
-    renderEmergency(model(data, 'e'));
-    document.title = (data.n ? data.n + ' · ' : '') + 'Emergency card';
+    throw new Error('old');
   } catch (e) {
-    fail('No card in this link. Scan the QR code on the phone again.');
+    fail('This QR is not valid any more. Ask for a new QR from the MyHealth app.');
   }
 })();
 </script>
