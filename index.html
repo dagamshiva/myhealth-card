@@ -117,6 +117,11 @@ td{padding:9px 0;border-top:1px solid var(--line);vertical-align:top}
 td.n b{display:block}
 td.n span{color:var(--mute);font-size:13px}
 td.r{text-align:right;white-space:nowrap}
+table.labt{table-layout:fixed}
+table.labt td{overflow-wrap:anywhere;word-break:break-word}
+table.labt td.rng{text-align:right;white-space:normal;font-size:12.5px;line-height:1.3;color:var(--mute)}
+table.labt td.r{white-space:normal}
+table.labt .val{white-space:normal;font-size:14px;max-width:100%}
 .val{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:3px 9px;font-weight:800;background:var(--red-bg);color:var(--red-ink)}
 .val.low{background:var(--amber-bg);color:var(--amber)}
 
@@ -137,7 +142,63 @@ td.r{text-align:right;white-space:nowrap}
 .err{text-align:center;padding:60px 14px;color:var(--mute)}
 .err .i{width:44px;height:44px;margin-bottom:10px;color:var(--red)}
 .row-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
-@media print{body{background:#fff}.actions,.row-actions,.gate{display:none}.card,.hero{box-shadow:none;break-inside:avoid}}
+/* the doctor's summary: eight parts, each with its own colour */
+main.wide{max-width:720px}
+.pdfbar{display:flex;gap:10px;justify-content:flex-end;margin:12px 0 0}
+.pdfbar .btn{margin-top:0;min-width:0;padding:11px 18px;font-size:15px}
+.acc-teal{--acc:#0f766e;--accon:#fff}.acc-blue{--acc:#1d4ed8;--accon:#fff}.acc-violet{--acc:#7c3aed;--accon:#fff}.acc-rose{--acc:#be123c;--accon:#fff}
+.acc-green{--acc:#15803d;--accon:#fff}.acc-indigo{--acc:#4338ca;--accon:#fff}.acc-orange{--acc:#c2410c;--accon:#fff}.acc-red{--acc:#b91c1c;--accon:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--d:1}
+:root:not([data-theme=light]) .acc-teal{--acc:#2dd4bf;--accon:#0b1220}:root:not([data-theme=light]) .acc-blue{--acc:#7aa2ff;--accon:#0b1220}
+:root:not([data-theme=light]) .acc-violet{--acc:#b69cff;--accon:#0b1220}:root:not([data-theme=light]) .acc-rose{--acc:#fb7a9a;--accon:#0b1220}
+:root:not([data-theme=light]) .acc-green{--acc:#5ee08a;--accon:#0b1220}:root:not([data-theme=light]) .acc-indigo{--acc:#9aa0ff;--accon:#0b1220}
+:root:not([data-theme=light]) .acc-orange{--acc:#ff9a62;--accon:#0b1220}:root:not([data-theme=light]) .acc-red{--acc:#ff8a85;--accon:#0b1220}}
+:root[data-theme=dark] .acc-teal{--acc:#2dd4bf;--accon:#0b1220}:root[data-theme=dark] .acc-blue{--acc:#7aa2ff;--accon:#0b1220}
+:root[data-theme=dark] .acc-violet{--acc:#b69cff;--accon:#0b1220}:root[data-theme=dark] .acc-rose{--acc:#fb7a9a;--accon:#0b1220}
+:root[data-theme=dark] .acc-green{--acc:#5ee08a;--accon:#0b1220}:root[data-theme=dark] .acc-indigo{--acc:#9aa0ff;--accon:#0b1220}
+:root[data-theme=dark] .acc-orange{--acc:#ff9a62;--accon:#0b1220}:root[data-theme=dark] .acc-red{--acc:#ff8a85;--accon:#0b1220}
+.card[class*="acc-"]{border-top:4px solid var(--acc);padding-top:12px}
+.card[class*="acc-"] h2{color:var(--acc);font-size:12.5px}
+.card[class*="acc-"] h2 .ib{background:var(--acc);color:var(--accon)}
+.card[class*="acc-"] h2 .count{background:var(--chip);color:var(--ink);border-radius:999px;padding:1px 9px;font-size:12px}
+.sub2{display:block;color:var(--mute);font-size:13.5px}
+.allergy{margin-top:10px;display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--red);background:var(--red-bg);border-radius:14px;padding:9px 12px}
+.allergy .i{color:var(--red);margin-top:2px}
+.allergy b{display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--red-ink)}
+.allergy.none{border-color:var(--green);background:var(--green-bg)}.allergy.none .i{color:var(--green)}.allergy.none b{color:var(--green)}
+.allergy .tag{background:var(--red);color:var(--on);margin:4px 6px 0 0}
+.chipv{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 13px 5px 10px;margin:0 8px 8px 0;font-weight:700;background:color-mix(in srgb,var(--acc) 13%,var(--card));color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 30%,var(--card))}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.cols2{grid-template-columns:1fr}}
+.cols2 h3{margin:0 0 4px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.item .dot{background:color-mix(in srgb,var(--acc) 14%,var(--card));color:var(--acc)}
+.item.bad{border-left:4px solid #f59e0b;padding-left:10px}
+.date{flex:0 1 auto;max-width:46%;margin-left:auto;border-radius:12px;background:var(--chip);padding:1px 10px;font-size:12.5px;font-weight:700;text-align:right;align-self:flex-start}
+.card .item>div{min-width:0}
+.card{min-width:0;overflow-wrap:anywhere}
+main{overflow-x:hidden}
+.badge{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12.5px;font-weight:700;background:var(--chip);color:var(--ink);margin-right:6px}
+.badge.red{background:var(--red-bg);color:var(--red-ink)}
+.must{display:inline-block;border-radius:999px;padding:0 8px;font-size:11.5px;font-weight:800;background:var(--red-bg);color:var(--red-ink);margin-left:6px}
+table.labt{table-layout:fixed}
+table.labt td{overflow-wrap:anywhere;word-break:break-word}
+table.labt td.rng{text-align:right;white-space:normal;font-size:12.5px;line-height:1.3;color:var(--mute)}
+table.labt td.r{white-space:normal}
+table.labt .val{white-space:normal;font-size:14px;max-width:100%}
+.val.low{background:var(--amber-bg);color:var(--amber)}
+.note{margin:0 0 8px;color:var(--mute);font-size:13.5px}
+@page{size:A4;margin:12mm}
+@media print{
+  html,body{background:#fff!important}
+  body{font-size:12.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  main,main.wide{max-width:none;padding:0}
+  .actions,.row-actions,.gate,.pdfbar,.foot.live{display:none!important}
+  .card,.hero{box-shadow:none;break-inside:avoid}
+  .card{margin-top:10px;padding:10px 12px}
+  .hero{border-radius:14px;padding:12px 14px}
+  .hero h1{font-size:22px}
+  tr{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -243,14 +304,15 @@ td.r{text-align:right;white-space:nowrap}
       allergies: strs(full ? raw.allergies : raw.al),
       conditions: strs(full ? raw.conditions : raw.co),
       devices: strs(full ? raw.devices : raw.dv),
-      meds: [], stays: [], vitals: [], abnormal: [], scans: [], contacts: [], body: raw.body || {}
+      meds: [], stays: [], vitals: [], abnormal: [], scans: [], contacts: [], body: raw.body || {},
+      labs: [], surgeries: [], courses: [], screening: [], vaccines: [], specialTests: [], lifestyle: [], careTeam: []
     };
     (full ? raw.medicines : raw.md || []).forEach(function (x) {
-      if (full && x && x.name) m.meds.push({ name: x.name, dose: x.dose || '', imp: x.important === true });
+      if (full && x && x.name) m.meds.push({ name: x.name, dose: x.dose || '', imp: x.important === true, purpose: str(x.purpose), food: str(x.food), since: str(x.since), doctor: str(x.doctor), asNeeded: x.asNeeded === true });
       else if (!full && x && x[0]) m.meds.push({ name: x[0], dose: x[1] || '', imp: x[2] === 1 });
     });
     (full ? raw.stays : raw.st || []).forEach(function (x) {
-      if (full && x) m.stays.push({ title: x.title || '', badge: x.badge || '', date: x.date || '' });
+      if (full && x) m.stays.push({ title: x.title || '', badge: x.badge || '', date: x.date || '', admitted: str(x.admitted), discharged: str(x.discharged), hospital: str(x.hospital), why: str(x.why) });
       else if (!full && x) m.stays.push({ title: x[0] || '', badge: x[1] || '', date: x[2] || '' });
     });
     (full ? raw.vitals : raw.vt || []).forEach(function (x) {
@@ -260,6 +322,21 @@ td.r{text-align:right;white-space:nowrap}
     (raw.abnormal || []).forEach(function (x) { if (x && x.name) m.abnormal.push(x); });
     (raw.scans || []).forEach(function (x) { if (x) m.scans.push(x); });
     (raw.c || []).forEach(function (x) { if (x && x[1]) m.contacts.push({ name: x[0] || 'Family', phone: x[1] }); });
+    if (full) {
+      (Array.isArray(raw.labs) ? raw.labs : []).forEach(function (x) { if (x && x.name && x.value) m.labs.push({ name: str(x.name), value: str(x.value), unit: str(x.unit), range: str(x.range), date: str(x.date), status: str(x.status) || 'normal', organ: str(x.organ) }); });
+      (Array.isArray(raw.surgeries) ? raw.surgeries : []).forEach(function (x) { if (x && x.name) m.surgeries.push({ name: str(x.name), status: str(x.status), date: str(x.date) }); });
+      (Array.isArray(raw.courses) ? raw.courses : []).forEach(function (x) {
+        if (!x || !x.why) return;
+        var rows = [];
+        (Array.isArray(x.rows) ? x.rows : []).forEach(function (r) { if (r && r.name) rows.push({ name: str(r.name), dose: str(r.dose), days: typeof r.days === 'number' ? r.days : 0 }); });
+        m.courses.push({ why: str(x.why), date: str(x.date), doctor: str(x.doctor), place: str(x.place), rows: rows });
+      });
+      (Array.isArray(raw.screening) ? raw.screening : []).forEach(function (x) { if (x && x.label && x.value) m.screening.push({ label: str(x.label), value: str(x.value) }); });
+      (Array.isArray(raw.vaccines) ? raw.vaccines : []).forEach(function (x) { if (x && x.name) m.vaccines.push({ name: str(x.name), date: str(x.date) }); });
+      (Array.isArray(raw.specialTests) ? raw.specialTests : []).forEach(function (x) { if (x && x.name) m.specialTests.push({ name: str(x.name), result: str(x.result), date: str(x.date) }); });
+      (Array.isArray(raw.lifestyle) ? raw.lifestyle : []).forEach(function (x) { if (x && x.label && x.value) m.lifestyle.push({ label: str(x.label), value: str(x.value) }); });
+      (Array.isArray(raw.careTeam) ? raw.careTeam : []).forEach(function (x) { if (x) m.careTeam.push({ doctor: str(x.doctor), hospital: str(x.hospital), date: str(x.date) }); });
+    }
     return m;
   }
 
@@ -454,6 +531,171 @@ td.r{text-align:right;white-space:nowrap}
     return c;
   }
 
+  /* ---------- the doctor's summary: eight parts, the same as the PDF ---------- */
+  function acc(c, color) { c.className += ' acc-' + color; return c; }
+  function itemRow(iconName, title, subs, dateText, extraClass) {
+    var it = el('div', 'item' + (extraClass ? ' ' + extraClass : ''));
+    var d = el('span', 'dot'); d.appendChild(icon(iconName));
+    var t = el('div');
+    t.appendChild(el('b', null, title));
+    (subs || []).forEach(function (s) { if (s) t.appendChild(el('span', 'sub', s)); });
+    it.appendChild(d); it.appendChild(t);
+    if (dateText) it.appendChild(el('span', 'date', dateText));
+    return it;
+  }
+
+  /* 1. Patient details, with the allergies that must never be missed */
+  function detailsCard(m) {
+    var c = acc(card('Patient details', 'person'), 'teal');
+    var g = el('div', 'facts');
+    function fact(ic, label, value) {
+      if (!value) return;
+      var f = el('div', 'fact');
+      var s = el('small'); s.appendChild(icon(ic)); s.appendChild(document.createTextNode(label));
+      f.appendChild(s); f.appendChild(el('b', null, value));
+      g.appendChild(f);
+    }
+    fact('person', 'Age and sex', [m.age ? m.age + ' yrs' : '', m.sex].filter(Boolean).join(' · '));
+    fact('drop', 'Blood group', m.blood);
+    fact('ruler', 'Height', m.body && m.body.height ? m.body.height + ' ft' : '');
+    fact('scale', 'Weight', m.body && m.body.weight ? m.body.weight + ' kg' : '');
+    if (g.childNodes.length) c.appendChild(g);
+    var has = m.allergies.length > 0;
+    var al = el('div', 'allergy' + (has ? '' : ' none'));
+    al.appendChild(icon(has ? 'warn' : 'shield'));
+    var box = el('div');
+    box.appendChild(el('b', null, 'Allergies'));
+    if (has) m.allergies.forEach(function (a) { box.appendChild(el('span', 'tag', a)); });
+    else box.appendChild(document.createTextNode('None recorded'));
+    al.appendChild(box);
+    c.appendChild(al);
+    return c;
+  }
+
+  /* 2. Health at a glance */
+  function glanceCard(m) {
+    var c = vitalsCard(m, 'Health at a glance');
+    return c ? acc(c, 'blue') : null;
+  }
+
+  /* 3. Long-term illness */
+  function illnessCard(m) {
+    if (!m.conditions.length) return null;
+    var c = acc(card('Long-term illness', 'pulse', '', m.conditions.length), 'violet');
+    m.conditions.forEach(function (x) { c.appendChild(withIcon('pulse', x, 'chipv')); });
+    return c;
+  }
+
+  /* 4. Surgeries and implants */
+  function surgeriesImplantsCard(m) {
+    if (!m.surgeries.length && !m.devices.length) return null;
+    var c = acc(card('Surgeries and implants', 'steth', '', m.surgeries.length + m.devices.length), 'rose');
+    var cols = el('div', m.surgeries.length && m.devices.length ? 'cols2' : '');
+    if (m.surgeries.length) {
+      var a = el('div'); a.appendChild(el('h3', null, 'Surgeries'));
+      m.surgeries.forEach(function (x) {
+        a.appendChild(itemRow('steth', x.name, [x.status === 'Advised' ? 'Advised, not done yet' : 'Done'], x.date ? longDate(x.date) : ''));
+      });
+      cols.appendChild(a);
+    }
+    if (m.devices.length) {
+      var b = el('div'); b.appendChild(el('h3', null, 'Implants and devices'));
+      m.devices.forEach(function (x) { b.appendChild(itemRow('device', x, [])); });
+      cols.appendChild(b);
+    }
+    c.appendChild(cols);
+    return c;
+  }
+
+  /* 5. Current medicines */
+  function medicinesDoctorCard(m) {
+    if (!m.meds.length) return null;
+    var c = acc(card('Current medicines', 'pill', '', m.meds.length), 'green');
+    m.meds.forEach(function (x) {
+      var it = el('div', 'item');
+      var d = el('span', 'dot'); d.appendChild(icon(x.imp ? 'star' : 'pill', x.imp ? 'star' : ''));
+      var t = el('div');
+      var b = el('b', null, x.name);
+      if (x.imp) b.appendChild(el('span', 'must', 'Do not miss'));
+      t.appendChild(b);
+      var line = [x.asNeeded ? 'When needed' : x.dose, x.food].filter(Boolean).join(' · ');
+      if (line) t.appendChild(el('span', 'sub', line));
+      var more = [x.purpose ? 'For ' + x.purpose : '', x.since ? 'Since ' + longDate(x.since) : ''].filter(Boolean).join(' · ');
+      if (more) t.appendChild(el('span', 'sub', more));
+      it.appendChild(d); it.appendChild(t);
+      c.appendChild(it);
+    });
+    return c;
+  }
+
+  /* 6. Scans: the result, and when */
+  function scansDoctorCard(m) {
+    if (!m.scans.length) return null;
+    var c = acc(card('Scans', 'scan', '', m.scans.length), 'indigo');
+    m.scans.forEach(function (x) {
+      c.appendChild(itemRow('scan', x.type || 'Scan', [x.text], x.date ? longDate(x.date) : '', x.abnormal ? 'bad' : ''));
+    });
+    return c;
+  }
+
+  /* 7. Recent hospital stays: just the reason, and when */
+  function staysReasonCard(m) {
+    if (!m.stays.length) return null;
+    var c = acc(card('Recent hospital stays', 'hospital', '', m.stays.length), 'orange');
+    m.stays.forEach(function (x) {
+      var when = x.admitted || x.discharged
+        ? [x.admitted ? 'In ' + longDate(x.admitted) : '', x.discharged ? 'Out ' + longDate(x.discharged) : ''].filter(Boolean).join(' · ')
+        : (x.date ? longDate(x.date) : '');
+      var it = itemRow('hospital', x.title, [], when);
+      var t = it.childNodes[1];
+      var meta = el('span', 'sub');
+      if (x.badge) meta.appendChild(el('span', 'badge' + (x.badge === 'Emergency' ? ' red' : ''), x.badge));
+      if (x.hospital) meta.appendChild(document.createTextNode(x.hospital));
+      t.appendChild(meta);
+      if (x.why) t.appendChild(el('span', 'sub', x.why));
+      c.appendChild(it);
+    });
+    return c;
+  }
+
+  /* 8. The important test results only: outside the normal range */
+  function importantResultsCard(m) {
+    var list = m.labs.length ? m.labs : m.abnormal.map(function (x) { return { name: x.name, value: x.value, unit: x.unit, range: x.range, date: x.date, status: 'abnormal' }; });
+    if (!list.length) return null;
+    var c = acc(card('Latest test results', 'flask', '', list.length), 'red');
+    c.appendChild(el('p', 'note', 'Only the important results are shown: the ones outside the normal range.'));
+    var t = el('table', 'labt');
+    var cg = el('colgroup');
+    ['34%', '32%', '34%'].forEach(function (w) { var col = el('col'); col.style.width = w; cg.appendChild(col); });
+    t.appendChild(cg);
+    var head = el('tr');
+    ['Test', 'Result', 'Normal'].forEach(function (h, i) { var th = el('th', null, h); if (i) th.style.textAlign = 'right'; head.appendChild(th); });
+    t.appendChild(head);
+    list.forEach(function (x) {
+      var s = (x.status || 'abnormal').toLowerCase();
+      var r = el('tr');
+      var n = el('td', 'n'); n.appendChild(el('b', null, x.name));
+      if (x.date) n.appendChild(el('span', 'sub2', longDate(x.date)));
+      var v = el('td', 'r');
+      var arrow = s === 'low' ? '▼ ' : s === 'high' ? '▲ ' : '';
+      v.appendChild(el('span', s === 'borderline' ? 'val low' : 'val', arrow + (x.value || '') + (x.unit ? ' ' + x.unit : '')));
+      if (s !== 'abnormal') v.appendChild(el('span', 'sub2', s.charAt(0).toUpperCase() + s.slice(1)));
+      r.appendChild(n); r.appendChild(v); r.appendChild(el('td', 'rng', x.range || ''));
+      t.appendChild(r);
+    });
+    c.appendChild(t);
+    return c;
+  }
+
+  function pdfBar() {
+    var bar = el('div', 'pdfbar');
+    var b = el('button', 'btn ghost'); b.type = 'button';
+    b.appendChild(icon('print')); b.appendChild(document.createTextNode(' Download or share as PDF'));
+    b.addEventListener('click', function () { window.print(); });
+    bar.appendChild(b);
+    return bar;
+  }
+
   function add(parent, node) { if (node) parent.appendChild(node); }
 
   /* ---------- the two designs ---------- */
@@ -470,29 +712,30 @@ td.r{text-align:right;white-space:nowrap}
     add(app, deviceCard(m));
     add(app, stayCard(m, true));
     foot(app, opened
-      ? 'Shown from a QR that works for 3 minutes. When the time is up this card closes by itself and the QR stops working. Nothing is stored on this website. General information, not a diagnosis.'
+      ? 'Shown from a QR that works only until the time the family chose. When the time is up this card closes by itself and the QR stops working. Nothing is stored on this website. General information, not a diagnosis.'
       : 'Sample data. General information, not a diagnosis.');
   }
 
   function renderDoctor(m, opened) {
     app.textContent = '';
+    app.className = 'wide';
     app.appendChild(hero(m));
-    add(app, factsCard(m));
-    add(app, vitalsCard(m));
-    app.appendChild(allergyCard(m));
-    add(app, conditionCard(m));
-    add(app, medCard(m, false));
-    add(app, resultsCard(m));
-    add(app, scanCard(m));
-    add(app, stayCard(m, false));
-    add(app, deviceCard(m));
+    app.appendChild(pdfBar());
+    add(app, detailsCard(m));
+    add(app, glanceCard(m));
+    add(app, illnessCard(m));
+    add(app, surgeriesImplantsCard(m));
+    add(app, medicinesDoctorCard(m));
+    add(app, scansDoctorCard(m));
+    add(app, staysReasonCard(m));
+    add(app, importantResultsCard(m));
     var act = el('div', 'row-actions');
     var p = el('button', 'btn ghost'); p.type = 'button';
-    p.appendChild(icon('print')); p.appendChild(document.createTextNode(' Print or save as PDF'));
+    p.appendChild(icon('print')); p.appendChild(document.createTextNode(' Download or share as PDF'));
     p.addEventListener('click', function () { window.print(); });
     act.appendChild(p);
     app.appendChild(act);
-    foot(app, opened ? 'Read-only. This one-time link no longer works. Opened ' + new Date().toLocaleString() + '.' : 'Sample data.');
+    foot(app, opened ? 'Read-only. This one-time link no longer works. Opened ' + new Date().toLocaleString() + '. General information from the patient\'s saved records, not a diagnosis.' : 'Sample data.');
   }
 
   function foot(parent, text) {
@@ -518,7 +761,7 @@ td.r{text-align:right;white-space:nowrap}
     var sh = el('div', 'shield'); sh.appendChild(icon('shield'));
     g.appendChild(sh);
     g.appendChild(el('h2', null, 'Enter the code from the family'));
-    g.appendChild(el('p', null, 'The patient or family shows an 8-character code on their phone. This summary opens once and expires after 3 minutes.'));
+    g.appendChild(el('p', null, 'The patient or family shows an 8-character code on their phone. This summary opens once and expires after the time the family chose.'));
     var input = el('input'); input.type = 'text'; input.maxLength = 9; input.autocomplete = 'off';
     input.setAttribute('inputmode', 'text'); input.setAttribute('autocapitalize', 'characters'); input.placeholder = 'ABCD-EFGH';
     input.setAttribute('aria-label', 'Code from the family');
@@ -573,16 +816,19 @@ td.r{text-align:right;white-space:nowrap}
 
   function clock(ms) {
     var t = Math.max(0, Math.ceil(ms / 1000));
-    return Math.floor(t / 60) + ':' + (t % 60 < 10 ? '0' : '') + (t % 60);
+    var h = Math.floor(t / 3600), mi = Math.floor((t % 3600) / 60), se = t % 60;
+    if (t >= 7200) return h + 'h ' + (mi < 10 ? '0' : '') + mi + 'm';
+    if (h >= 1) return h + ':' + (mi < 10 ? '0' : '') + mi + ':' + (se < 10 ? '0' : '') + se;
+    return mi + ':' + (se < 10 ? '0' : '') + se;
   }
 
-  /* an emergency card is shown only until the QR's 3 minutes are over, by the server's clock (not this phone's) */
+  /* an emergency card is shown only until the QR's chosen time is over (3 minutes, 1 hour or 1 day), by the server's clock (not this phone's) */
   function closeAt(ms) {
     clearTimeout(closeTimer);
     clearInterval(tickTimer);
     if (ms <= 0) { closeForPrivacy(); return; }
     var end = Date.now() + ms;
-    var note = el('div', 'foot');
+    var note = el('div', 'foot live');
     note.appendChild(icon('shield'));
     var label = document.createTextNode('');
     note.appendChild(label);
@@ -629,7 +875,7 @@ td.r{text-align:right;white-space:nowrap}
         return;
       }
       if (r.res.status === 410 || r.res.status === 403) {
-        fail('This QR has expired or was already used. A QR works once, for 3 minutes. Ask for a new one.');
+        fail('This QR has expired or was already used. A doctor QR works once, and every QR stops at the time the family chose. Ask for a new one.');
         return;
       }
       retry('This card could not be opened right now.', token, apiRoot, code);
@@ -655,11 +901,22 @@ td.r{text-align:right;white-space:nowrap}
     c: [['Family', '9876543210'], ['Brother', '9123456780']] };
   var DEMO_D = { name: 'Shiva Kumar Dagan', age: 42, sex: 'Male', blood: 'B+', mhId: 'MH-2026-7X3Y', updated: '2026-11-09', body: { height: 5.4, weight: 65 },
     allergies: ['Penicillin (rash)', 'Sulfa drugs'], conditions: ['Type 2 diabetes', 'High blood pressure', 'Fatty liver'],
-    medicines: [{ name: 'Telmisartan 40 mg', dose: 'Morning, after food', important: true }, { name: 'Metformin 500 mg', dose: 'Twice a day', important: true }, { name: 'Vitamin D3', dose: 'Weekly' }],
-    devices: ['Coronary stent (2022)'], stays: [{ title: 'Heart attack', badge: 'Emergency', date: '2025-04-14' }, { title: 'Appendix surgery', badge: 'Planned', date: '2019-02-03' }],
     vitals: [{ label: 'BP', status: 'Slightly high', value: '120/85', unit: 'mmHg', tone: 'watch' }, { label: 'Diabetic', status: 'Pre-diabetic', value: '125', unit: 'mg/dL', tone: 'ok' }, { label: 'BMI', status: 'Overweight', value: '24.6', tone: 'watch' }],
-    abnormal: [{ name: 'C-Reactive Protein', value: '16.1', unit: 'mg/L', range: '< 5', date: '2026-10-11' }, { name: 'Haemoglobin', value: '11.2', unit: 'g/dL', range: '13 - 17', date: '2026-10-10' }, { name: 'White blood cells', value: '11000', unit: '/cumm', range: '5000 - 10000', date: '2026-10-10' }],
-    scans: [{ type: 'Ultrasound abdomen', text: 'Fatty liver, grade 1.', date: '2026-09-20' }] };
+    surgeries: [{ name: 'Coronary angioplasty with stent', status: 'Done', date: '2025-04-14' }, { name: 'Appendix surgery', status: 'Done', date: '2019-02-03' }],
+    devices: ['Coronary stent (2022)'],
+    medicines: [
+      { name: 'Telmisartan 40 mg', dose: '1-0-0', important: true, purpose: 'Blood pressure', food: 'after food', since: '2022-03-10' },
+      { name: 'Metformin 500 mg', dose: '1-0-1', important: true, purpose: 'Diabetes', food: 'after food', since: '2021-08-02' },
+      { name: 'Vitamin D3', dose: '1 weekly', purpose: 'Low vitamin D', since: '2026-09-01' }],
+    scans: [{ type: 'Ultrasound abdomen', text: 'Fatty liver, grade 1. Gallbladder and kidneys normal.', date: '2026-09-20' }, { type: '2D Echo', text: 'Heart pumps well (EF 55%).', date: '2026-04-25' }],
+    stays: [
+      { title: 'Heart attack (inferior wall MI)', badge: 'Emergency', date: '2025-04-14', admitted: '2025-04-14', discharged: '2025-04-19', hospital: 'Care and Cure Hospital', why: 'Chest pain for 2 hours with sweating; ECG showed a heart attack.' },
+      { title: 'Appendix surgery', badge: 'Hospital stay', date: '2019-02-03', admitted: '2019-02-03', discharged: '2019-02-05', hospital: 'City Hospital' }],
+    labs: [
+      { name: 'C-Reactive Protein', value: '16.1', unit: 'mg/L', range: '< 5', date: '2026-10-11', status: 'high' },
+      { name: 'Haemoglobin', value: '11.2', unit: 'g/dL', range: '13 - 17', date: '2026-10-10', status: 'low' },
+      { name: 'Approximate Mean Plasma Glucose', value: '125.20', unit: 'mg/dL', range: '90 - 120: Excellent Control / 121 - 150: Good Control / 151 - 180: Average Control / 181 - 210: Action Suggested / >211: Panic Value', date: '2026-10-10', status: 'high' },
+      { name: 'Glucose, fasting', value: '108', unit: 'mg/dL', range: '70 - 100', date: '2026-10-10', status: 'borderline' }] };
 
   /* ---------- start ---------- */
   try {
