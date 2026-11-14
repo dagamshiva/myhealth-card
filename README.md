@@ -18,5 +18,9 @@ The doctor page only talks to the MyHealth servers listed in `ALLOWED_API` insid
 (`https://teamjas.in/api/myhealth`, plus `https://localhost:44392/api/myhealth` for development),
 and the website must list this site's origin under `MyHealth:WebOrigins` so the browser may call it.
 
-Publish with GitHub Pages: repository `myhealth-card`, branch `main`, folder `/ (root)`.
-The app opens it from `appConfig.cardPage` in `src/config/app.ts`.
+The page is now served by teamjas.in itself, from `TeamJASWeb/wwwroot/myhealth-card.html` (a copy of this `index.html`),
+at https://teamjas.in/myhealth-card.html. It is the same site as the API, so the browser needs no cross-site permission.
+The app opens it from `appConfig.cardPage` in `src/config/app.ts`. When this file changes, copy it over the wwwroot file
+and publish TeamJASWeb.
+
+The GitHub Pages copy (repository `myhealth-card`, branch `main`) stays only so QR codes made earlier keep opening until they expire.
