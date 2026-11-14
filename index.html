@@ -549,9 +549,17 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     return it;
   }
 
-  /* 1. Patient details, with the allergies that must never be missed */
+  /* 1. Allergies, which must never be missed (age and sex are already in the header) */
   function detailsCard(m) {
-    var c = acc(card('Patient details', 'person'), 'teal');
+    var c = acc(card('Allergies', 'shield'), 'teal');
+    var has = m.allergies.length > 0;
+    var al = el('div', 'allergy' + (has ? '' : ' none'));
+    al.appendChild(icon(has ? 'warn' : 'shield'));
+    var box = el('div');
+    if (has) m.allergies.forEach(function (a) { box.appendChild(el('span', 'tag', a)); });
+    else box.appendChild(document.createTextNode('None recorded'));
+    al.appendChild(box);
+    c.appendChild(al);
     var g = el('div', 'facts');
     function fact(ic, label, value) {
       if (!value) return;
@@ -560,19 +568,9 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
       f.appendChild(s); f.appendChild(el('b', null, value));
       g.appendChild(f);
     }
-    fact('person', 'Age and sex', [m.age ? m.age + ' yrs' : '', m.sex].filter(Boolean).join(' · '));
     fact('ruler', 'Height', m.body && m.body.height ? m.body.height + ' ft' : '');
     fact('scale', 'Weight', m.body && m.body.weight ? m.body.weight + ' kg' : '');
     if (g.childNodes.length) c.appendChild(g);
-    var has = m.allergies.length > 0;
-    var al = el('div', 'allergy' + (has ? '' : ' none'));
-    al.appendChild(icon(has ? 'warn' : 'shield'));
-    var box = el('div');
-    box.appendChild(el('b', null, 'Allergies'));
-    if (has) m.allergies.forEach(function (a) { box.appendChild(el('span', 'tag', a)); });
-    else box.appendChild(document.createTextNode('None recorded'));
-    al.appendChild(box);
-    c.appendChild(al);
     return c;
   }
 
@@ -765,9 +763,9 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     var sh = el('div', 'shield'); sh.appendChild(icon('shield'));
     g.appendChild(sh);
     g.appendChild(el('h2', null, 'Enter the code from the family'));
-    g.appendChild(el('p', null, 'The patient or family shows an 8-character code on their phone. This summary opens once and expires after the time the family chose.'));
-    var input = el('input'); input.type = 'text'; input.maxLength = 9; input.autocomplete = 'off';
-    input.setAttribute('inputmode', 'text'); input.setAttribute('autocapitalize', 'characters'); input.placeholder = 'ABCD-EFGH';
+    g.appendChild(el('p', null, 'The patient or family shows a 4-digit code on their phone. This summary opens once and expires after the time the family chose.'));
+    var input = el('input'); input.type = 'text'; input.maxLength = 4; input.autocomplete = 'off';
+    input.setAttribute('inputmode', 'numeric'); input.setAttribute('pattern', '[0-9]*'); input.placeholder = '1234';
     input.setAttribute('aria-label', 'Code from the family');
     g.appendChild(input);
     var msg = el('p', 'msg'); msg.hidden = true;
@@ -779,12 +777,11 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     app.appendChild(g);
 
     input.addEventListener('input', function () {
-      var v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
-      input.value = v.length > 4 ? v.slice(0, 4) + '-' + v.slice(4) : v;
+      input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
     });
     function open() {
-      var code = input.value.replace(/[^A-Z0-9]/g, '');
-      if (code.length < 8) { msg.hidden = false; msg.textContent = 'Enter the 8-character code.'; return; }
+      var code = input.value.replace(/[^0-9]/g, '');
+      if (code.length < 4) { msg.hidden = false; msg.textContent = 'Enter the 4-digit code.'; return; }
       go.disabled = true; msg.hidden = true;
       fetch(apiRoot + '/shares/' + encodeURIComponent(token) + '/open', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
