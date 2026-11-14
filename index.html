@@ -723,13 +723,13 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     app.className = 'wide';
     app.appendChild(hero(m));
     app.appendChild(pdfBar());
-    add(app, detailsCard(m));
     add(app, glanceCard(m));
     add(app, illnessCard(m));
     add(app, surgeriesImplantsCard(m));
     add(app, medicinesDoctorCard(m));
     add(app, scansDoctorCard(m));
     add(app, staysReasonCard(m));
+    add(app, detailsCard(m));   // allergies, right before the latest test results
     add(app, importantResultsCard(m));
     foot(app, opened ? 'Read-only. This one-time link no longer works. Opened ' + new Date().toLocaleString() + '. General information from the patient\'s saved records, not a diagnosis.' : 'Sample data.');
   }
