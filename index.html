@@ -187,6 +187,14 @@ table.labt td.rng{text-align:right;white-space:normal;font-size:12.5px;line-heig
 table.labt td.r{white-space:normal}
 table.labt .val{white-space:normal;font-size:14px;max-width:100%}
 .val.low{background:var(--amber-bg);color:var(--amber)}
+.labs{display:flex;flex-direction:column;gap:10px}
+.lab{border:1px solid var(--line);border-left:4px solid var(--red);border-radius:14px;padding:10px 12px;background:color-mix(in srgb,var(--chip) 40%,var(--card))}
+.lab.amber{border-left-color:#f59e0b}.lab.ok{border-left-color:var(--green)}
+.lab-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.lab-name{min-width:0;flex:1 1 auto}.lab-name b{display:block}
+.lab-val{flex:0 0 auto;text-align:right;max-width:55%}.lab-val .val{white-space:normal;font-size:14px}
+.lab-rng{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);color:var(--mute);font-size:12.5px;line-height:1.4}
+.lab-rng .k{display:inline-block;margin-right:8px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .note{margin:0 0 8px;color:var(--mute);font-size:13.5px}
 @page{size:A4;margin:12mm}
 @media print{
@@ -476,24 +484,32 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     return c;
   }
 
+  /* test results as small cards (no table): name and date on the left, the value on the right, the normal range underneath */
+  function labList(list) {
+    var box = el('div', 'labs');
+    list.forEach(function (x) {
+      var st = (x.status || 'abnormal').toLowerCase();
+      var row = el('div', 'lab ' + (st === 'borderline' ? 'amber' : st === 'normal' ? 'ok' : 'red'));
+      var top = el('div', 'lab-top');
+      var left = el('div', 'lab-name');
+      left.appendChild(el('b', null, x.name || ''));
+      if (x.date) left.appendChild(el('span', 'sub2', longDate(x.date)));
+      var right = el('div', 'lab-val');
+      var arrow = st === 'low' ? '▼ ' : st === 'high' ? '▲ ' : '';
+      right.appendChild(el('span', st === 'borderline' ? 'val low' : 'val', arrow + (x.value || '') + (x.unit ? ' ' + x.unit : '')));
+      if (st !== 'abnormal') right.appendChild(el('span', 'sub2', st.charAt(0).toUpperCase() + st.slice(1)));
+      top.appendChild(left); top.appendChild(right);
+      row.appendChild(top);
+      if (x.range) { var rg = el('div', 'lab-rng'); rg.appendChild(el('span', 'k', 'Normal')); rg.appendChild(document.createTextNode(x.range)); row.appendChild(rg); }
+      box.appendChild(row);
+    });
+    return box;
+  }
+
   function resultsCard(m) {
     if (!m.abnormal.length) return null;
     var c = card('Out-of-range results', 'flask', '', m.abnormal.length);
-    var t = el('table');
-    var head = el('tr');
-    ['Test', 'Result', 'Normal'].forEach(function (h, i) { var th = el('th', null, h); if (i) th.style.textAlign = 'right'; head.appendChild(th); });
-    t.appendChild(head);
-    m.abnormal.forEach(function (x) {
-      var r = el('tr');
-      var n = el('td', 'n'); n.appendChild(el('b', null, x.name || '')); if (x.date) n.appendChild(el('span', null, longDate(x.date)));
-      var v = el('td', 'r');
-      var val = el('span', 'val'); val.appendChild(document.createTextNode((x.value || '') + (x.unit ? ' ' + x.unit : '')));
-      v.appendChild(val);
-      var g = el('td', 'r', x.range || '');
-      r.appendChild(n); r.appendChild(v); r.appendChild(g);
-      t.appendChild(r);
-    });
-    c.appendChild(t);
+    c.appendChild(labList(m.abnormal));
     return c;
   }
 
@@ -666,26 +682,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     if (!list.length) return null;
     var c = acc(card('Latest test results', 'flask', '', list.length), 'red');
     c.appendChild(el('p', 'note', 'Only the important results are shown: the ones outside the normal range.'));
-    var t = el('table', 'labt');
-    var cg = el('colgroup');
-    ['34%', '32%', '34%'].forEach(function (w) { var col = el('col'); col.style.width = w; cg.appendChild(col); });
-    t.appendChild(cg);
-    var head = el('tr');
-    ['Test', 'Result', 'Normal'].forEach(function (h, i) { var th = el('th', null, h); if (i) th.style.textAlign = 'right'; head.appendChild(th); });
-    t.appendChild(head);
-    list.forEach(function (x) {
-      var s = (x.status || 'abnormal').toLowerCase();
-      var r = el('tr');
-      var n = el('td', 'n'); n.appendChild(el('b', null, x.name));
-      if (x.date) n.appendChild(el('span', 'sub2', longDate(x.date)));
-      var v = el('td', 'r');
-      var arrow = s === 'low' ? '▼ ' : s === 'high' ? '▲ ' : '';
-      v.appendChild(el('span', s === 'borderline' ? 'val low' : 'val', arrow + (x.value || '') + (x.unit ? ' ' + x.unit : '')));
-      if (s !== 'abnormal') v.appendChild(el('span', 'sub2', s.charAt(0).toUpperCase() + s.slice(1)));
-      r.appendChild(n); r.appendChild(v); r.appendChild(el('td', 'rng', x.range || ''));
-      t.appendChild(r);
-    });
-    c.appendChild(t);
+    c.appendChild(labList(list));
     return c;
   }
 
