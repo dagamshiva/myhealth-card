@@ -944,7 +944,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
       var api = (parts.a || ALLOWED_API[0]).replace(/\/+$/, '');
       if (!parts.t || !/^[A-Za-z0-9_-]{8,100}$/.test(parts.t)) throw new Error('token');
       if (ALLOWED_API.indexOf(api) < 0) throw new Error('api');
-      if (parts.c && /^[A-Za-z0-9-]{4,9}$/.test(parts.c)) {   // 4 digits now; older QR codes had 8 characters
+      if (parts.c && /^[A-Za-z0-9-]{4,40}$/.test(parts.c)) {   // 4 digits typed by a doctor; an emergency link carries a long random code
         var code = parts.c.toUpperCase().replace(/[^A-Z0-9]/g, '');
         history.replaceState(null, '', location.pathname);   // the code never stays in the address bar or history
         autoOpen(parts.t, api, code);
