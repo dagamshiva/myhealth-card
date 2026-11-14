@@ -173,7 +173,8 @@ main.wide{max-width:720px}
 .cols2 h3{margin:0 0 4px;font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
 .item .dot{background:color-mix(in srgb,var(--acc) 14%,var(--card));color:var(--acc)}
 .item.bad{border-left:4px solid #f59e0b;padding-left:10px}
-.date{flex:0 1 auto;max-width:46%;margin-left:auto;border-radius:12px;background:var(--chip);padding:1px 10px;font-size:12.5px;font-weight:700;text-align:right;align-self:flex-start}
+.date{flex:0 0 auto;margin-left:auto;border-radius:12px;background:var(--chip);padding:3px 10px;font-size:12.5px;font-weight:700;text-align:right;align-self:flex-start;white-space:nowrap}
+.date .dl{display:block;line-height:1.35}
 .card .item>div{min-width:0}
 .card{min-width:0;overflow-wrap:anywhere}
 main{overflow-x:hidden}
@@ -357,7 +358,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     if (m.id) chips.appendChild(withIcon('shield', m.id, 'chip'));
     if (m.updated) chips.appendChild(withIcon('clock', 'Updated ' + longDate(m.updated), 'chip'));
     h.appendChild(chips);
-    if (m.gate) return h;
+    if (m.gate || !emergency) return h;
     var b = el('div', 'blood');
     b.appendChild(icon('drop'));
     var bt = el('div');
@@ -540,7 +541,11 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     t.appendChild(el('b', null, title));
     (subs || []).forEach(function (s) { if (s) t.appendChild(el('span', 'sub', s)); });
     it.appendChild(d); it.appendChild(t);
-    if (dateText) it.appendChild(el('span', 'date', dateText));
+    if (dateText) {
+      var dt = el('span', 'date');
+      [].concat(dateText).forEach(function (line) { dt.appendChild(el('span', 'dl', line)); });
+      it.appendChild(dt);
+    }
     return it;
   }
 
@@ -556,7 +561,6 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
       g.appendChild(f);
     }
     fact('person', 'Age and sex', [m.age ? m.age + ' yrs' : '', m.sex].filter(Boolean).join(' · '));
-    fact('drop', 'Blood group', m.blood);
     fact('ruler', 'Height', m.body && m.body.height ? m.body.height + ' ft' : '');
     fact('scale', 'Weight', m.body && m.body.weight ? m.body.weight + ' kg' : '');
     if (g.childNodes.length) c.appendChild(g);
@@ -644,7 +648,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     var c = acc(card('Recent hospital stays', 'hospital', '', m.stays.length), 'orange');
     m.stays.forEach(function (x) {
       var when = x.admitted || x.discharged
-        ? [x.admitted ? 'In ' + longDate(x.admitted) : '', x.discharged ? 'Out ' + longDate(x.discharged) : ''].filter(Boolean).join(' · ')
+        ? [x.admitted ? 'In ' + longDate(x.admitted) : '', x.discharged ? 'Out ' + longDate(x.discharged) : ''].filter(Boolean)
         : (x.date ? longDate(x.date) : '');
       var it = itemRow('hospital', x.title, [], when);
       var t = it.childNodes[1];
