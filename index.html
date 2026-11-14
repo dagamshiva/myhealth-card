@@ -682,8 +682,8 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
 
   function pdfBar() {
     var bar = el('div', 'pdfbar');
-    var b = el('button', 'btn ghost'); b.type = 'button';
-    b.appendChild(icon('print')); b.appendChild(document.createTextNode(' Download or share as PDF'));
+    var b = el('button', 'btn ghost'); b.type = 'button'; b.title = 'In the window that opens, choose Save as PDF as the printer';
+    b.appendChild(icon('print')); b.appendChild(document.createTextNode(' Save as PDF'));
     b.addEventListener('click', function () { window.print(); });
     bar.appendChild(b);
     return bar;
@@ -722,12 +722,6 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     add(app, scansDoctorCard(m));
     add(app, staysReasonCard(m));
     add(app, importantResultsCard(m));
-    var act = el('div', 'row-actions');
-    var p = el('button', 'btn ghost'); p.type = 'button';
-    p.appendChild(icon('print')); p.appendChild(document.createTextNode(' Download or share as PDF'));
-    p.addEventListener('click', function () { window.print(); });
-    act.appendChild(p);
-    app.appendChild(act);
     foot(app, opened ? 'Read-only. This one-time link no longer works. Opened ' + new Date().toLocaleString() + '. General information from the patient\'s saved records, not a diagnosis.' : 'Sample data.');
   }
 
