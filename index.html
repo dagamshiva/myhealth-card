@@ -175,6 +175,10 @@ main.wide{max-width:720px}
 .item.bad{border-left:4px solid #f59e0b;padding-left:10px}
 .date{flex:0 0 auto;margin-left:auto;border-radius:12px;background:var(--chip);padding:3px 10px;font-size:12.5px;font-weight:700;text-align:right;align-self:flex-start;white-space:nowrap}
 .date .dl{display:block;line-height:1.35}
+.item.has-date{display:grid;grid-template-columns:34px minmax(0,1fr) auto;column-gap:12px;row-gap:2px;align-items:start}
+.item.has-date .ibody{grid-column:2 / -1;min-width:0}
+.item.has-date .ibody:empty{display:none}
+.item.has-date .date{margin-left:0}
 .card .item>div{min-width:0}
 .card{min-width:0;overflow-wrap:anywhere}
 main{overflow-x:hidden}
@@ -560,13 +564,18 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     var d = el('span', 'dot'); d.appendChild(icon(iconName));
     var t = el('div');
     t.appendChild(el('b', null, title));
-    (subs || []).forEach(function (s) { if (s) t.appendChild(el('span', 'sub', s)); });
     it.appendChild(d); it.appendChild(t);
     if (dateText) {
+      // title and date on one line; the description below runs the full width, under the date as well
+      it.className += ' has-date';
       var dt = el('span', 'date');
       [].concat(dateText).forEach(function (line) { dt.appendChild(el('span', 'dl', line)); });
       it.appendChild(dt);
-    }
+      var body = el('div', 'ibody');
+      it.appendChild(body);
+      it.ibody = body;
+    } else it.ibody = t;
+    (subs || []).forEach(function (s) { if (s) it.ibody.appendChild(el('span', 'sub', s)); });
     return it;
   }
 
@@ -659,7 +668,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
         ? [x.admitted ? 'In ' + longDate(x.admitted) : '', x.discharged ? 'Out ' + longDate(x.discharged) : ''].filter(Boolean)
         : (x.date ? longDate(x.date) : '');
       var it = itemRow('hospital', x.title, [], when);
-      var t = it.childNodes[1];
+      var t = it.ibody;
       var meta = el('span', 'sub');
       if (x.badge) meta.appendChild(el('span', 'badge' + (x.badge === 'Emergency' ? ' red' : ''), x.badge));
       if (x.hospital) meta.appendChild(document.createTextNode(x.hospital));
