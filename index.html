@@ -714,7 +714,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     add(app, deviceCard(m));
     add(app, stayCard(m, true));
     foot(app, opened
-      ? 'Shown from a QR that works only until the time the family chose. When the time is up this card closes by itself and the QR stops working. Nothing is stored on this website. General information, not a diagnosis.'
+      ? 'Shown from a QR that works only until the time the family chose. When the time is up this card closes by itself and the QR stops working. Nothing is stored on this website; this browser tab keeps the card only until the time is up. General information, not a diagnosis.'
       : 'Sample data. General information, not a diagnosis.');
   }
 
@@ -786,8 +786,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
         go.disabled = false;
         if (r.res.ok && r.data && r.data.summary) {
           history.replaceState(null, '', location.pathname);
-          renderDoctor(model(r.data.summary, 'd'), true);
-          window.scrollTo(0, 0);
+          showCard(r.data.summary, leftFrom(r.data, CLOSE_AFTER_MS), true);
           return;
         }
         if (r.res.status === 403) { msg.textContent = (r.data && r.data.message) || 'That code is not right.'; }
@@ -834,7 +833,34 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     closeTimer = setTimeout(closeForPrivacy, ms);
   }
 
+  /* A refresh keeps the card until its own time is over. The summary is held only in this browser tab (sessionStorage, which the
+     browser drops when the tab closes) with the moment it ends, and is removed the moment that time passes. */
+  var STORE_KEY = 'mh-open-card';
+  function keepCard(sum, left) { try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ s: sum, end: Date.now() + left })); } catch (e) {} }
+  function forgetCard() { try { sessionStorage.removeItem(STORE_KEY); } catch (e) {} }
+  function savedCard() {
+    try { var v = JSON.parse(sessionStorage.getItem(STORE_KEY) || 'null'); if (v && v.s && v.end > Date.now() + 1000) return v; } catch (e) {}
+    forgetCard(); return null;
+  }
+  /* how long is left, by the server's clock (not this phone's) */
+  function leftFrom(data, fallback) {
+    var until = Date.parse(data.expiresUtc), at = Date.parse(data.nowUtc);
+    return isFinite(until) && isFinite(at) ? until - at : fallback;
+  }
+  function showCard(sum, left, fresh) {
+    if (sum && sum.k === 'e') {
+      renderEmergency(model(sum, 'e'), true);
+      document.title = (sum.n ? sum.n + ' · ' : '') + 'Emergency card';
+    } else {
+      renderDoctor(model(sum, 'd'), true);
+    }
+    window.scrollTo(0, 0);
+    closeAt(left);
+    if (fresh) keepCard(sum, left);
+  }
+
   function closeForPrivacy() {
+    forgetCard();
     clearInterval(tickTimer);
     app.textContent = '';
     document.title = 'Card closed';
@@ -853,20 +879,7 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     }).then(function (r) {
       if (r.res.ok && r.data && r.data.summary) {
         var sum = r.data.summary;
-        var left = CLOSE_AFTER_MS;
-        if (sum && sum.k === 'e') {
-          renderEmergency(model(sum, 'e'), true);
-          document.title = (sum.n ? sum.n + ' \u00b7 ' : '') + 'Emergency card';
-          var until = Date.parse(r.data.expiresUtc), at = Date.parse(r.data.nowUtc);
-          left = isFinite(until) && isFinite(at) ? until - at : 3 * 60 * 1000;
-          window.scrollTo(0, 0);
-          closeAt(left);
-          return;
-        }
-        renderDoctor(model(sum, 'd'), true);
-        window.scrollTo(0, 0);
-        clearTimeout(closeTimer);
-        closeTimer = setTimeout(closeForPrivacy, left);
+        showCard(sum, leftFrom(r.data, sum && sum.k === 'e' ? 3 * 60 * 1000 : CLOSE_AFTER_MS), true);
         return;
       }
       if (r.res.status === 410 || r.res.status === 403) {
@@ -920,6 +933,11 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     if (hash === 'demo') { renderEmergency(model(DEMO_E, 'e')); return; }
     if (hash === 'demo-doctor') { renderDoctor(model(DEMO_D, 'd'), false); return; }
     if (hash === 'demo-gate') { renderGate('demo', ALLOWED_API[0]); return; }
+    if (hash.indexOf('t=') !== 0) {
+      // refreshed after the card was opened: show it again until its time is over
+      var kept = savedCard();
+      if (kept) { showCard(kept.s, kept.end - Date.now(), false); return; }
+    }
     if (hash.indexOf('t=') === 0) {
       var parts = {};
       hash.split('&').forEach(function (p) { var i = p.indexOf('='); if (i > 0) parts[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1)); });
