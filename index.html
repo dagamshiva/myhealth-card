@@ -364,6 +364,11 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     if (m.sex) who.push(m.sex);
     if (who.length) chips.appendChild(withIcon('person', who.join(' · '), 'chip'));
     if (m.id) chips.appendChild(withIcon('shield', m.id, 'chip'));
+    if (!emergency && !m.gate) {
+      if (m.blood) chips.appendChild(withIcon('drop', 'Blood ' + m.blood, 'chip'));
+      if (m.body && m.body.height) chips.appendChild(withIcon('ruler', m.body.height + ' ft', 'chip'));
+      if (m.body && m.body.weight) chips.appendChild(withIcon('scale', m.body.weight + ' kg', 'chip'));
+    }
     if (m.updated) chips.appendChild(withIcon('clock', 'Updated ' + longDate(m.updated), 'chip'));
     h.appendChild(chips);
     if (m.gate || !emergency) return h;
@@ -576,17 +581,6 @@ table.labt .val{white-space:normal;font-size:14px;max-width:100%}
     else box.appendChild(document.createTextNode('None recorded'));
     al.appendChild(box);
     c.appendChild(al);
-    var g = el('div', 'facts');
-    function fact(ic, label, value) {
-      if (!value) return;
-      var f = el('div', 'fact');
-      var s = el('small'); s.appendChild(icon(ic)); s.appendChild(document.createTextNode(label));
-      f.appendChild(s); f.appendChild(el('b', null, value));
-      g.appendChild(f);
-    }
-    fact('ruler', 'Height', m.body && m.body.height ? m.body.height + ' ft' : '');
-    fact('scale', 'Weight', m.body && m.body.weight ? m.body.weight + ' kg' : '');
-    if (g.childNodes.length) c.appendChild(g);
     return c;
   }
 
